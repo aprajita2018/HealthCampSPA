@@ -68,6 +68,10 @@ app.get('/reports', function(req, res){
 
 });
 
+app.get('/', function(req, res){
+    res.end("Nothing to see here!");
+});
+
 //express js server listening on 3000
 app.listen(3001);
 console.log(" Server listening on port 3001.");
