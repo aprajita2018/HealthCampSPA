@@ -2,12 +2,9 @@
 var express = require('express');
 //create an express app
 var app = express();
+
 //require express middleware body-parser
 var bodyParser = require('body-parser');
-//require express session
-var session = require('express-session');
-//require cookie-parser
-var cookieParser = require('cookie-parser');
 
 var cors = require('cors');
 
@@ -32,16 +29,6 @@ app.use(function(req, res, next){
 //use body parser to parse JSON and urlencoded request body
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
-
-//use cookie-parser to parse request headers
-app.use(cookieParser());
-
-//use session to store user data between HTTP requests
-app.use(session({
-    secret: 'cmpe280_secure_string',
-    resave: false,
-    saveUninitialized: true
-}));
 
 //route to create the patient
 app.post('/create_patient', function(req,res){
