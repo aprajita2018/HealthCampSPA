@@ -26,41 +26,11 @@
        }
     </style>
     <script type="text/javascript">
-        var DB_NAME    = "health_records";
-        var DB_VERSION = "1.0";
-        var DB_TITLE   = "Health Camp SPA Database";
-        var DB_BYTES   = 500000;
-        var db = window.openDatabase(DB_NAME, DB_VERSION, DB_TITLE, DB_BYTES);
-
-        function sqlFail(err) { alert("SQL failed: " + err.message); }
-        function txFail(err) { alert("TX failed: " + err.message); }
-
-        function sqlWin(tx, response) { console.log("SQL succeeded: " + response.rows.length + " rows."); }
-        function txWin(tx) { console.log("TX succeeded."); }
-
-        //Creating table if it does not exist, and executing the function automatically
-        function create_table(){
-            db.transaction( function(tx) {
-                var queryParams = [];
-                tx.executeSql(
-                    "CREATE TABLE IF NOT EXISTS patients (name VARCHAR(20) NOT NULL, age INTEGER NOT NULL, gender VARCHAR(20) NOT NULL, photo BLOB NULL, medications VARCHAR(100) NULL, notes VARCHAR(100) NULL);",
-                    queryParams,
-                    sqlWin,
-                    sqlFail
-                );
-            }, txFail, txWin);
-        }
-        
         var imgURL;
         var new_patient_id;
 
-
         //Insert into DB- first name, last Name, gender & age
-        function insert_table(db){
-            // var fName = document.getElementById('fName').value;
-            // var lName = document.getElementById('lName').value;
-            // var gender = document.getElementById('gender').value;
-            // var age = document.getElementById('age').value;
+        function insert_table(){
             var photo = imgURL;
 
             var fd = new FormData();
@@ -71,19 +41,6 @@
 
             console.log("Will try to insert into DB");
 
-            // db.transaction( function(tx) {
-            //     tx.executeSql("INSERT INTO patients (name, age, gender, photo, medications, notes) VALUES (?, ?, ?, ?, ? , ?);",
-            //         [ fName + " " + lName, age, gender, photo,  "", ""],
-            //         function(tx, results){
-            //             console.log(results);
-            //             new_patient_id = results.insertId;
-            //             //alert("Patient " +fName + " " + lName + " added to DB. Please proceed to Health Vitals tab to add more details.");
-            //             document.getElementById('nav-vitals-tab').click();
-            //         },
-            //         sqlFail
-            //     );
-            // }, txFail, txWin);
-
             var xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
@@ -91,83 +48,68 @@
                 console.log(xhttp.responseText);
                 }
             };
-            xhttp.open("POST", "http://localhost:3001/createPatient", true);
-            //xhttp.setRequestHeader('Origin', "localhost");
+            xhttp.open("POST", "./create_patient", true);
+            xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
             xhttp.send(fd);
         }
         
         //Update Table with Health Vital details: medication & notes
-        function update_table(db){
+        function update_table(){
             console.log("Will try to update DB");
             var medications = document.getElementById('medications').value;
             var med_notes = document.getElementById('med_notes').value;
-
-            console.log(medications);
-            console.log(med_notes);
-
-            db.transaction( function(tx) {
-                tx.executeSql("UPDATE patients SET medications=?, notes=? WHERE rowid=?;",
-                    [ medications, med_notes, new_patient_id],
-                    function(tx, results){
-                        //alert("Patient details updated. You can view Reports now.");
-                        get_patients(db);
-                        document.getElementById('nav-report-tab').click();
-                    },
-                    sqlFail
-                );
-            }, txFail, txWin);
         }
 
 
         //Select from DB
-        function get_patients(db){
+        function get_patients(){
             var patient_tbody = document.getElementById('patient_table').tBodies[0];
             patient_tbody.innerHTML = "";
 
-            db.readTransaction( function(tx) {
-                tx.executeSql("SELECT * FROM patients;",
-                    [],
-                    function(tx, results) {
-                        for(var i = 0; i < results.rows.length; i++) {
-                            var row = results.rows.item(i);
-                            console.log("Patient: "  + row.name);
-                            var name = row.name;
-                            var age = row.age;
-                            var gender = row.gender;
-                            var photo = row.photo;
-                            var medications = row.medications;
-                            var notes = row.notes;
+            // db.readTransaction( function(tx) {
+            //     tx.executeSql("SELECT * FROM patients;",
+            //         [],
+            //         function(tx, results) {
+            //             for(var i = 0; i < results.rows.length; i++) {
+            //                 var row = results.rows.item(i);
+            //                 console.log("Patient: "  + row.name);
+            //                 var name = row.name;
+            //                 var age = row.age;
+            //                 var gender = row.gender;
+            //                 var photo = row.photo;
+            //                 var medications = row.medications;
+            //                 var notes = row.notes;
 
-                            var tr = document.createElement('tr');
-                            var td1 = document.createElement('td');
-                            var td2 = document.createElement('td');
-                            var td3 = document.createElement('td');
-                            var td4 = document.createElement('td');
-                            var td5 = document.createElement('td');
-                            var td6 = document.createElement('td');
+            //                 var tr = document.createElement('tr');
+            //                 var td1 = document.createElement('td');
+            //                 var td2 = document.createElement('td');
+            //                 var td3 = document.createElement('td');
+            //                 var td4 = document.createElement('td');
+            //                 var td5 = document.createElement('td');
+            //                 var td6 = document.createElement('td');
 
-                            td1.innerHTML = name;
-                            td2.innerHTML = age;
-                            td3.innerHTML = gender;
-                            td4.innerHTML = "<img class='user_profile_photo' src=" + photo + " />";
-                            td5.innerHTML = medications;
-                            td6.innerHTML = notes;
+            //                 td1.innerHTML = name;
+            //                 td2.innerHTML = age;
+            //                 td3.innerHTML = gender;
+            //                 td4.innerHTML = "<img class='user_profile_photo' src=" + photo + " />";
+            //                 td5.innerHTML = medications;
+            //                 td6.innerHTML = notes;
 
-                            tr.appendChild(td1);
-                            tr.appendChild(td2);
-                            tr.appendChild(td3);
-                            tr.appendChild(td4);
-                            tr.appendChild(td5);
-                            tr.appendChild(td6);
-                            patient_tbody.appendChild(tr);
-                        }
-                    },
-                    sqlFail
-                );
-            }, txFail, txWin);
+            //                 tr.appendChild(td1);
+            //                 tr.appendChild(td2);
+            //                 tr.appendChild(td3);
+            //                 tr.appendChild(td4);
+            //                 tr.appendChild(td5);
+            //                 tr.appendChild(td6);
+            //                 patient_tbody.appendChild(tr);
+            //             }
+            //         },
+            //         sqlFail
+            //     );
+            // }, txFail, txWin);
         }
 
-        window.onload = create_table(db);
+        //window.onload = create_table(db);
     </script>
 </head>
 
@@ -219,7 +161,7 @@
                             </div>
         
                             <div class="row m-3">
-                                <button id="savebutton" class="btn btn-success btn-lg col-md-4 m-2" onclick="insert_table(db);">Save</button>
+                                <button id="savebutton" class="btn btn-success btn-lg col-md-4 m-2" onclick="insert_table();">Save</button>
                             </div>
 
                         </div>
@@ -297,7 +239,7 @@
                                 </div>
             
                                 <div class="row m-5">
-                                    <button type="submit" id="savebutton" class="btn btn-success btn-lg col-md-4 m-2" onclick="update_table(db);">Save</button>
+                                    <button type="submit" id="savebutton" class="btn btn-success btn-lg col-md-4 m-2" onclick="update_table();">Save</button>
                                 </div>
     
                             </div>
@@ -346,7 +288,7 @@
     
     </div>  
     <script>
-        get_patients(db);
+        //get_patients(db);
     </script>  
 </body>
 

@@ -3,6 +3,8 @@ var express = require('express');
 //create an express app
 var app = express();
 
+var mysql = require('mysql');
+
 //require express middleware body-parser
 var bodyParser = require('body-parser');
 
@@ -19,7 +21,7 @@ app.use(cors({origin: null, credentials: true}));
 
 //allow access control
 app.use(function(req, res, next){
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', '.');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT,DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers');
@@ -30,10 +32,21 @@ app.use(function(req, res, next){
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
+
+var con = mysql.createConnection({
+    port: '3306',
+    host: 'db4free.net',
+    user: 'homeaway_admin',
+    password: 'z5yh6vsPaWys3NR',
+    database: 'homeaway_hw_db'
+})
+
+
 //route to create the patient
 app.post('/create_patient', function(req,res){
+    console.log("Received request to create user: " + req.body.fName);
     var newPatient = {firstName: req.body.fName, lastName: req.body.lName, gender: req.body.gender, age: req.body.age};
-    res.json({success: "Done, created user", details: newPatient});
+    res.json({success: "Done, created user", details: req.body.fName});
 });
 
 //route to update the patient
