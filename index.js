@@ -46,7 +46,7 @@ app.get('/all_patients', function(req, res){
 });
 
 app.get('/', function(req, res){
-    res.render("/spa");
+    res.render("spa");
 });
 
 //express js server listening on 3000
