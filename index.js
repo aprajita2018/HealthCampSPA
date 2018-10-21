@@ -9,6 +9,8 @@ var session = require('express-session');
 //require cookie-parser
 var cookieParser = require('cookie-parser');
 
+var cors = require('cors');
+
 //set the view engine to ejs
 app.set('view engine', 'ejs');
 //set the directory of views
@@ -16,6 +18,17 @@ app.set('views', './views');
 //specify the path of static directory
 app.use(express.static(__dirname + './public'));
 
+app.use(cors({origin: null, credentials: true}));
+
+//allow access control
+app.use(function(req, res, next){
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT,DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers');
+    res.setHeader('Cache-Control', 'no-cache');
+    next();
+});
 //use body parser to parse JSON and urlencoded request body
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -36,9 +49,9 @@ app.get('/demographics', function(req,res){
 });
 
 //route to create the patient
-app.post('/create', function(req,res){
-    var newPatient = {firstName: req.body.firstName, lastName: req.body.lastName, gender: req.body.gender, age: req.body.age};
-
+app.post('/createPatient', function(req,res){
+    var newPatient = {firstName: req.body.fName, lastName: req.body.lName, gender: req.body.gender, age: req.body.age};
+    res.json({success: "Done, created user", details: newPatient});
 });
 
 //route to display the health vitals tab
@@ -56,6 +69,5 @@ app.get('/reports', function(req, res){
 });
 
 //express js server listening on 3000
-var server = app.listen(3000, function(){
-    console.log(" Server listening on port 3000.");
-});
+app.listen(3001);
+console.log(" Server listening on port 3001.");

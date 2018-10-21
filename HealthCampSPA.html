@@ -57,26 +57,43 @@
 
         //Insert into DB- first name, last Name, gender & age
         function insert_table(db){
-            var fName = document.getElementById('fName').value;
-            var lName = document.getElementById('lName').value;
-            var gender = document.getElementById('gender').value;
-            var age = document.getElementById('age').value;
+            // var fName = document.getElementById('fName').value;
+            // var lName = document.getElementById('lName').value;
+            // var gender = document.getElementById('gender').value;
+            // var age = document.getElementById('age').value;
             var photo = imgURL;
 
+            var fd = new FormData();
+            fd.append("fName", document.getElementById('fName').value);
+            fd.append("lName", document.getElementById('lName').value);
+            fd.append("gender", document.getElementById('gender').value);
+            fd.append("age", document.getElementById('age').value);
 
             console.log("Will try to insert into DB");
-            db.transaction( function(tx) {
-                tx.executeSql("INSERT INTO patients (name, age, gender, photo, medications, notes) VALUES (?, ?, ?, ?, ? , ?);",
-                    [ fName + " " + lName, age, gender, photo,  "", ""],
-                    function(tx, results){
-                        console.log(results);
-                        new_patient_id = results.insertId;
-                        //alert("Patient " +fName + " " + lName + " added to DB. Please proceed to Health Vitals tab to add more details.");
-                        document.getElementById('nav-vitals-tab').click();
-                    },
-                    sqlFail
-                );
-            }, txFail, txWin);
+
+            // db.transaction( function(tx) {
+            //     tx.executeSql("INSERT INTO patients (name, age, gender, photo, medications, notes) VALUES (?, ?, ?, ?, ? , ?);",
+            //         [ fName + " " + lName, age, gender, photo,  "", ""],
+            //         function(tx, results){
+            //             console.log(results);
+            //             new_patient_id = results.insertId;
+            //             //alert("Patient " +fName + " " + lName + " added to DB. Please proceed to Health Vitals tab to add more details.");
+            //             document.getElementById('nav-vitals-tab').click();
+            //         },
+            //         sqlFail
+            //     );
+            // }, txFail, txWin);
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                // Typical action to be performed when the document is ready:
+                console.log(xhttp.responseText);
+                }
+            };
+            xhttp.open("POST", "http://localhost:3001/createPatient", true);
+            //xhttp.setRequestHeader('Origin', "localhost");
+            xhttp.send(fd);
         }
         
         //Update Table with Health Vital details: medication & notes
