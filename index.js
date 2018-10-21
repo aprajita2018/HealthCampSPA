@@ -29,16 +29,16 @@ app.use(function(req, res, next){
     next();
 });
 //use body parser to parse JSON and urlencoded request body
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 
 
 var con = mysql.createConnection({
     port: '3306',
     host: 'db4free.net',
-    user: 'homeaway_admin',
-    password: 'z5yh6vsPaWys3NR',
-    database: 'homeaway_hw_db'
+    user: 'sjsu_aprajita',
+    password: 'MR7263Muz4uT5TS',
+    database: 'sjsu_projects'
 })
 
 
@@ -46,16 +46,76 @@ var con = mysql.createConnection({
 app.post('/create_patient', function(req,res){
     console.log("Received request to create user: " + req.body.fName);
     var newPatient = {firstName: req.body.fName, lastName: req.body.lName, gender: req.body.gender, age: req.body.age};
-    res.json({success: "Done, created user", details: req.body.fName});
+
+    con.connect(function(err){
+        if(err){
+            throw err;
+        }
+        console.log("Connected to DB");
+
+        var sql = "INSERT INTO healthapp_patients (fName, lName, age, gender, photo, medications, notes) VALUES("
+            + mysql.escape(req.body.fName) + ","
+            + mysql.escape(req.body.lName) + ","
+            + mysql.escape(req.body.age) + ","
+            + mysql.escape(req.body.gender) + ","
+            + mysql.escape(req.body.photo) + ", '', '')";
+        //console.log(sql);
+
+        con.query(sql, function(err, result){
+            if(err){
+                console.log(err);
+                res.writeHead(404,{
+                    'Content-Type' : 'text/plain'
+                })
+                res.end("Could not create user");
+            }
+            else{
+                res.setHeader('status', 200);
+                res.json({success: "User added to DB", new_id: result.insertId});
+            }
+        })
+    });
 });
 
 //route to update the patient
 app.post('/update_patient', function(req, res){
+    var sql = "UPDATE healthapp_patients SET medications="
+      + mysql.escape(req.body.medications) + ", notes="
+      + mysql.escape(req.body.notes) + " WHERE id="
+      + mysql.escape(req.body.id);
+
+    con.query(sql, function(err, result){
+        if(err){
+            console.log(err);
+            res.writeHead(404,{
+                'Content-Type' : 'text/plain'
+            })
+            res.end("Could not fetch patients");
+        }
+        else{
+            res.setHeader('status', 200);
+            res.json({success: "User updated in DB"});
+        }
+    });
 
 });
 //route to fetch the patient details from the DB and display it
 app.get('/all_patients', function(req, res){
+    var sql = "SELECT * FROM healthapp_patients";
 
+    con.query(sql, function(err, result){
+        if(err){
+            console.log(err);
+            res.writeHead(404,{
+                'Content-Type' : 'text/plain'
+            })
+            res.end("Could not update user");
+        }
+        else{
+            res.setHeader('status', 200);
+            res.send(JSON.stringify(result));
+        }
+    });
 });
 
 app.get('/', function(req, res){
