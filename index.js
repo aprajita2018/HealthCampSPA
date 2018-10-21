@@ -59,7 +59,7 @@ app.get('/all_patients', function(req, res){
 });
 
 app.get('/', function(req, res){
-    res.end("Nothing to see here!");
+    res.render("/index");
 });
 
 //express js server listening on 3000
