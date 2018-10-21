@@ -49,6 +49,7 @@
             }).then(response => response.json())
               .then(function(response){
                     new_patient_id = response.new_id;
+                    document.getElementById('nav-vitals-tab').click();
                 }
             );
         }
@@ -71,6 +72,7 @@
             }).then(response => response.json())
               .then(function(response){
                     console.log("Patient updated");
+                    document.getElementById('nav-report-tab').click();
                 }
             );
         }
