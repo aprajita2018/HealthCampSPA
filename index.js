@@ -43,28 +43,18 @@ app.use(session({
     saveUninitialized: true
 }));
 
-//route to display the demographics tab
-app.get('/demographics', function(req,res){
-    res.redirect('/');
-});
-
 //route to create the patient
-app.post('/createPatient', function(req,res){
+app.post('/create_patient', function(req,res){
     var newPatient = {firstName: req.body.fName, lastName: req.body.lName, gender: req.body.gender, age: req.body.age};
     res.json({success: "Done, created user", details: newPatient});
 });
 
-//route to display the health vitals tab
-app.get('/healthVitals', function(req,res){
-    res.redirect('/healthVitals');
-});
-
 //route to update the patient
-app.post('/update', function(req, res){
+app.post('/update_patient', function(req, res){
 
 });
 //route to fetch the patient details from the DB and display it
-app.get('/reports', function(req, res){
+app.get('/all_patients', function(req, res){
 
 });
 
@@ -73,5 +63,9 @@ app.get('/', function(req, res){
 });
 
 //express js server listening on 3000
-app.listen(3001);
-console.log(" Server listening on port 3001.");
+// Start the server
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`App listening on port ${PORT}`);
+  console.log('Press Ctrl+C to quit.');
+});
